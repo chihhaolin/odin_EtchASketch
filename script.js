@@ -3,6 +3,7 @@ const CONTAINER_SIZE = 960;
 
 const gridContainer = document.getElementById('grid-container');
 const resetBtn = document.getElementById('reset-btn');
+const resetColorsBtn = document.getElementById('reset-colors-btn');
 
 function getRandomColor() {
   const r = Math.floor(Math.random() * 256);
@@ -12,13 +13,15 @@ function getRandomColor() {
 }
 
 function paintCell(cell) {
-  const count = parseInt(cell.dataset.count || '0') + 1;
-  cell.dataset.count = count;
+  const count = parseInt(cell.dataset.count || '0');
 
-  const opacity = Math.min(count * 0.1, 1.0);
-  const color = getRandomColor();
+  if (count >= 10) return;
 
-  cell.style.backgroundColor = color;
+  const newCount = count + 1;
+  cell.dataset.count = newCount;
+
+  const opacity = newCount * 0.1;
+  cell.style.backgroundColor = getRandomColor();
   cell.style.opacity = opacity;
 }
 
@@ -62,7 +65,16 @@ gridContainer.addEventListener('mouseover', (e) => {
   }
 });
 
+function handleResetColors() {
+  document.querySelectorAll('.grid-cell').forEach((cell) => {
+    cell.style.backgroundColor = '#ffffff';
+    cell.style.opacity = '1';
+    cell.dataset.count = '0';
+  });
+}
+
 resetBtn.addEventListener('click', handleReset);
+resetColorsBtn.addEventListener('click', handleResetColors);
 
 document.addEventListener('DOMContentLoaded', () => {
   createGrid(DEFAULT_SIZE);
