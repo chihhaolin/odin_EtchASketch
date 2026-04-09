@@ -5,13 +5,6 @@ const gridContainer = document.getElementById('grid-container');
 const resetBtn = document.getElementById('reset-btn');
 const resetColorsBtn = document.getElementById('reset-colors-btn');
 
-function getRandomColor() {
-  const r = Math.floor(Math.random() * 256);
-  const g = Math.floor(Math.random() * 256);
-  const b = Math.floor(Math.random() * 256);
-  return `rgb(${r}, ${g}, ${b})`;
-}
-
 function paintCell(cell) {
   const count = parseInt(cell.dataset.count || '0');
 
@@ -20,9 +13,19 @@ function paintCell(cell) {
   const newCount = count + 1;
   cell.dataset.count = newCount;
 
-  const opacity = newCount * 0.1;
-  cell.style.backgroundColor = getRandomColor();
-  cell.style.opacity = opacity;
+  // Pick and store a random base color on the first interaction (T09)
+  if (newCount === 1) {
+    cell.dataset.r = Math.floor(Math.random() * 256);
+    cell.dataset.g = Math.floor(Math.random() * 256);
+    cell.dataset.b = Math.floor(Math.random() * 256);
+  }
+
+  // Darken toward black by 10% per interaction (T10)
+  const factor = 1 - newCount * 0.1;
+  const r = Math.round(parseInt(cell.dataset.r) * factor);
+  const g = Math.round(parseInt(cell.dataset.g) * factor);
+  const b = Math.round(parseInt(cell.dataset.b) * factor);
+  cell.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
 }
 
 function createGrid(size) {
@@ -67,9 +70,11 @@ gridContainer.addEventListener('mouseover', (e) => {
 
 function handleResetColors() {
   document.querySelectorAll('.grid-cell').forEach((cell) => {
-    cell.style.backgroundColor = '#ffffff';
-    cell.style.opacity = '1';
+    cell.style.backgroundColor = '';
     cell.dataset.count = '0';
+    delete cell.dataset.r;
+    delete cell.dataset.g;
+    delete cell.dataset.b;
   });
 }
 
